@@ -1,9 +1,8 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'domains/http_exception.dart';
 import 'providers/user.dart';
-import 'utils.dart';
 
 class BindView extends StatefulWidget {
   static const String routerName = "bind-view";
@@ -15,57 +14,55 @@ class BindView extends StatefulWidget {
 
 class _BindViewState extends State<BindView> {
   final GlobalKey<FormState> _formKey = GlobalKey();
+
   final Map<String, String> _authData = {
     'invite_code': '',
   };
 
   var _isLoading = false;
 
-  final _passwordController = TextEditingController();
-
-  Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) {
-      // Invalid!
-      return;
-    }
-    _formKey.currentState!.save();
-    setState(() {
-      _isLoading = true;
-    });
-    await Provider.of<User>(context, listen: false).bind(
-      _authData['invite_code'],
-    );
-    setState(() {
-      // TODO 处理错误信息
-      _isLoading = false;
-    });
-  }
+  final _codeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      elevation: 8.0,
-      child: Container(
-        height: 260,
-        constraints: BoxConstraints(minHeight: 260),
-        width: deviceSize.width * 0.75,
-        padding: EdgeInsets.all(16.0),
+    final scaffold = ScaffoldMessenger.of(context);
+    return Scaffold(
+      body: Container(
+        height: 200,
+        constraints: const BoxConstraints(minHeight: 200),
+        width: deviceSize.width * 0.85,
+        padding: const EdgeInsets.all(16.0),
+        margin: EdgeInsets.symmetric(
+          vertical:
+              (deviceSize.height - MediaQuery.of(context).viewInsets.bottom) *
+                  0.3,
+          horizontal: 30,
+        ),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
             child: Column(
               children: [
                 TextFormField(
-                  decoration: const InputDecoration(labelText: '邀请码'),
+                  controller: _codeController,
+                  decoration: InputDecoration(
+                    labelText: '邀请码:',
+                    labelStyle: TextStyle(
+                      fontSize: 26,
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.clear),
+                      onPressed: _codeController.clear,
+                      padding: EdgeInsets.all(2.0),
+                    ),
+                  ),
                   keyboardType: TextInputType.text,
                   validator: (value) {
                     if (value == null || value.isEmpty || value.length != 32) {
                       return "无效的输入";
                     }
+                    return null;
                   },
                   onSaved: (value) {
                     _authData['invite_code'] = value ?? "";
@@ -74,7 +71,32 @@ class _BindViewState extends State<BindView> {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                       textStyle: const TextStyle(fontSize: 20)),
-                  onPressed: _submit,
+                  onPressed: () async {
+                    if (!_formKey.currentState!.validate()) {
+                      // Invalid!
+                      return;
+                    }
+                    _formKey.currentState!.save();
+                    setState(() {
+                      _isLoading = true;
+                    });
+                    try {
+                      await Provider.of<User>(context, listen: false).bind(
+                        _authData['invite_code'],
+                      );
+                      
+                    } on HttpException catch (err) {
+                      scaffold.showSnackBar(
+                        SnackBar(
+                          content: Text(err.message),
+                          duration: const Duration(seconds: 1),
+                        ),
+                      );
+                    }
+                    setState(() {
+                      _isLoading = false;
+                    });
+                  },
                   child: const Text('提交'),
                 )
               ],

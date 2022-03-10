@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:words_app/domains/http_exception.dart';
 import '../config.dart';
 import '../utils.dart';
 
 class User with ChangeNotifier {
   String? _token;
-  String? _error;
 
   bool get isAuth {
     return _token != null;
@@ -35,7 +35,8 @@ class User with ChangeNotifier {
       ),
     );
     if (resp.statusCode != 200) {
-      _error = json.decode(resp.body)['message'];
+      var error = json.decode(resp.body)['message'];
+      throw HttpException(error);
     }
     final responseData = json.decode(resp.body);
     if (responseData['error'] != null) {
