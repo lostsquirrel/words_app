@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:words_app/bind_view.dart';
+import 'bind_view.dart';
 
+import 'default_plan_view.dart';
 import 'providers/user.dart';
 
 class HomeView extends StatelessWidget {
@@ -10,8 +11,15 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
-    user.tryAutoLogin().then((user) =>
-        {Navigator.pushReplacementNamed(context, BindView.routerName)});
+    user.tryAutoLogin().then((isLogin) => {
+          if (isLogin)
+            {
+              Navigator.pushReplacementNamed(
+                  context, DefaultPlanView.routerName)
+            }
+          else
+            {Navigator.pushReplacementNamed(context, BindView.routerName)}
+        });
 
     return Container();
   }

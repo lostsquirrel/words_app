@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="tech.shangao.words.words_app">
    <application
-        android:label="words_app"
+        android:label="背单词"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

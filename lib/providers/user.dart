@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:words_app/domains/http_exception.dart';
+import '../domains/http_exception.dart';
 import '../config.dart';
 import '../utils.dart';
 
@@ -65,7 +65,7 @@ class User with ChangeNotifier {
       throw Exception(responseData['error']['message']);
     }
     _token = responseData['token'];
-    notifyListeners();
+    // notifyListeners();
     return true;
   }
 }

@@ -81,10 +81,18 @@ class _BindViewState extends State<BindView> {
                       _isLoading = true;
                     });
                     try {
-                      await Provider.of<User>(context, listen: false).bind(
+                      var isSuccess =
+                          await Provider.of<User>(context, listen: false).bind(
                         _authData['invite_code'],
                       );
-                      
+                      if (isSuccess) {
+                        scaffold.showSnackBar(
+                          const SnackBar(
+                            content: Text("加入成功！"),
+                            duration: Duration(seconds: 1),
+                          ),
+                        );
+                      }
                     } on HttpException catch (err) {
                       scaffold.showSnackBar(
                         SnackBar(
