@@ -24,52 +24,37 @@ Future<DeviceInfo?> getDeviceInfo() async {
 }
 
 Future<dynamic> sendPost(String path, Map<String, Object> params) async {
-  final url = Uri.https(baseUrl, path);
+  final url = Uri.parse("$baseUrl$path");
 
   final resp = await http.post(
     url,
     headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + token
+      HttpHeaders.contentTypeHeader: "application/json",
+      HttpHeaders.authorizationHeader: "Bearer $token"
     },
     body: json.encode(
       params,
     ),
   );
   if (resp.statusCode != 200) {
-    if (resp.statusCode == 500) {
-      throw HttpException(resp.body);
-    }
-    var error = json.decode(resp.body)['message'];
-    throw HttpException(error);
+    throw HttpException(resp.body);
   }
-  final responseData = json.decode(resp.body);
-  if (responseData is Map && responseData['error'] != null) {
-    throw Exception(responseData['error']['message']);
-  }
-  return responseData;
+  return resp.body;
 }
 
 Future<dynamic> sendGet(String path) async {
-  final url = Uri.https(baseUrl, path);
+  final url = Uri.parse("$baseUrl$path");
   // print("get $path");
   final resp = await http.get(
     url,
     headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + token
+      HttpHeaders.contentTypeHeader: "application/json",
+      HttpHeaders.authorizationHeader: "Bearer $token"
     },
   );
   if (resp.statusCode != 200) {
-    if (resp.statusCode == 500) {
-      throw HttpException(resp.body);
-    }
-    var error = json.decode(resp.body)['message'];
-    throw HttpException(error);
+    throw HttpException(resp.body);
   }
-  final responseData = json.decode(resp.body);
-  if (responseData is Map && responseData['error'] != null) {
-    throw Exception(responseData['error']['message']);
-  }
-  return responseData;
+
+  return resp.body;
 }

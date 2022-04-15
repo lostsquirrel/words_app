@@ -27,11 +27,9 @@ class Word {
   });
 
   factory Word.fromJson(Map<String, dynamic> json) {
-    var _phonetics = json['phonetic'];
-    var phonetics = List<Phonetic>.from(_phonetics.map((p) {
-      var _p = p as Map<String, dynamic>;
-      return Phonetic.fromJson(_p);
-    }).toList());
+    var _phonetics = json['phonetic'].cast<Map<String, dynamic>>();
+    var phonetics =
+        _phonetics.map<Phonetic>((p) => Phonetic.fromJson(p)).toList();
 
     return Word(
       id: json['id'],
